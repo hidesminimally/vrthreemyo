@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<!-- No significant errors ( apart from the twitter, facebook, etc). Unsure of what's wrong at this point on. --> 
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment</title>
+        
+        <meta property="title" content="Barry Martin&#39;s Hopalong Orbits Visualizer - WebGL Experiment">
+        <meta property="description" content="An interactive flight through attractor orbits generated using Barry Martin&#39;s Hopalong formula.">
+        
+        <meta property="og:title" content="Barry Martin&#39;s Hopalong Orbits Visualizer - WebGL Experiment">
+        <meta property="og:image" content="http://iacopoapps.appspot.com/hopalongwebgl/image.jpg">
+        <meta property="og:description" content="An interactive flight through attractor orbits generated using Barry Martin&#39;s Hopalong formula.">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                background-color: #000000;
+                margin: 0px;
+                overflow: hidden;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+                font-weight: bold;
+                text-align:center;
+            }
+            a {
+                color:#ffffaa;
+            }
+            #info {
+                color: #fff;
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+                z-index: 100;
+            }
+            #plusone {
+                position: absolute;
+                bottom: 5px;
+                left: 10px;
+                z-index: 100;
+            }
+            #tweet {
+                position: absolute;
+                bottom: 7px;
+                left: 100px;
+                z-index: 100;
+            }
+            #fb {
+                position: absolute;
+                bottom: 11px;
+                left: 210px;
+                z-index: 100;           
+            }
+            
+            #chaosnebula {
+                position: absolute;
+                padding: 5px;
+                bottom: 0px;
+                right: 5px;
+                z-index: 100;       
+                color:#fff;
+            }
+
+            #about {
+                    text-align:left;
+                    z-index:110; 
+                    position:absolute;
+                    top: 25px;
+                    left: 5px;
+                    display:none;
+                    width: 400px;
+                    color:#fff; background: #121212; opacity:0.8; border-radius:20px; padding: 16px 
+            }
+            #aboutlink {
+                z-index:110; 
+                    position:absolute;
+                    top: 5px;
+                    left: 5px;                  
+            }
+        </style>
+        
+        <script src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/cb=gapi.loaded_1" async=""></script><script src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript" async="" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/plusone.js" gapi_processed="true"></script><script id="facebook-jssdk" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/all.js"></script><script type="text/javascript" async="" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/ga.js"></script><script async="" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/gtm.js"></script><script type="text/javascript">
+          function recordOutboundLink(link, category, action) {
+            _gat._getTrackerByName()._trackEvent(category, action);
+            setTimeout('document.location = "' + link.href + '"', 100);
+          }
+        </script>
+    <style type="text/css"></style><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}.fb_link img{border:none}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_reset .fb_dialog_legacy{overflow:visible}.fb_dialog_advanced{padding:10px;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px}.fb_dialog_content{background:#fff;color:#333}.fb_dialog_close_icon{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yL/r/s816eWC-2sl.gif);cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{top:5px;left:5px;right:auto}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yL/r/s816eWC-2sl.gif)}.fb_dialog_close_icon:active{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yL/r/s816eWC-2sl.gif)}.fb_dialog_loader{background-color:#f6f7f8;border:1px solid #606060;font-size:24px;padding:20px}.fb_dialog_top_left,.fb_dialog_top_right,.fb_dialog_bottom_left,.fb_dialog_bottom_right{height:10px;width:10px;overflow:hidden;position:absolute}.fb_dialog_top_left{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 0;left:-10px;top:-10px}.fb_dialog_top_right{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 -10px;right:-10px;top:-10px}.fb_dialog_bottom_left{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 -20px;bottom:-10px;left:-10px}.fb_dialog_bottom_right{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 -30px;right:-10px;bottom:-10px}.fb_dialog_vert_left,.fb_dialog_vert_right,.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{position:absolute;background:#525252;filter:alpha(opacity=70);opacity:.7}.fb_dialog_vert_left,.fb_dialog_vert_right{width:10px;height:100%}.fb_dialog_vert_left{margin-left:-10px}.fb_dialog_vert_right{right:0;margin-right:-10px}.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{width:100%;height:10px}.fb_dialog_horiz_top{margin-top:-10px}.fb_dialog_horiz_bottom{bottom:0;margin-bottom:-10px}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #3a5795;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{-webkit-transform:none;height:100%;margin:0;overflow:visible;position:absolute;top:-10000px;left:0;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{max-height:590px;min-height:590px;max-width:500px;min-width:500px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .45);position:absolute;left:0;top:0;width:100%;min-height:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_content .dialog_header{-webkit-box-shadow:white 0 1px 1px -1px inset;background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#738ABA), to(#2C4987));border-bottom:1px solid;border-color:#1d4088;color:#fff;font:14px Helvetica, sans-serif;font-weight:bold;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{-webkit-font-smoothing:subpixel-antialiased;height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#4966A6), color-stop(.5, #355492), to(#2A4887));border:1px solid #2f477a;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-webkit-box-shadow:rgba(0, 0, 0, .117188) 0 1px 1px inset, rgba(255, 255, 255, .167969) 0 1px 0;display:inline-block;margin-top:3px;max-width:85px;line-height:18px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{border:none;background:none;color:#fff;font:12px Helvetica, sans-serif;font-weight:bold;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #555;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f6f7f8;border:1px solid #555;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_hide_iframes iframe{position:relative;left:-10000px}.fb_iframe_widget_loader{position:relative;display:inline-block}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}.fb_iframe_widget_loader iframe{min-height:32px;z-index:2;zoom:1}.fb_iframe_widget_loader .FB_Loader{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif) no-repeat;height:32px;width:32px;margin-left:-16px;position:absolute;left:50%;z-index:4}</style></head>
+    <body data-twttr-rendered="true">
+    <!-- Google Tag Manager -->
+    <noscript>&lt;iframe src="//www.googletagmanager.com/ns.html?id=GTM-JH92"
+    height="0" width="0" style="display:none;visibility:hidden"&gt;&lt;/iframe&gt;</noscript>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-JH92');</script>
+    <!-- End Google Tag Manager -->
+      
+        <script src="js/three.min.js"></script>
+        <script src="jaanga_StereoEffect.js"></script>
+        <script src="jaanga_DeviceOrientationControls.js"></script>
+        <script src="jaanga_DetectScreenSize.js"></script>
+        <script src="RequestAnimationFrame.js"></script>
+    
+    <script>
+          /*
+           * AUTHOR: Iacopo Sassarini
+           */
+    
+
+
+        var VISUALS_VISIBLE = true;
+        
+        var SCALE_FACTOR = 1500;
+        var CAMERA_BOUND = 200;
+        
+        var NUM_POINTS_SUBSET = 40000;
+        var NUM_SUBSETS       = 7;
+        var NUM_POINTS = NUM_POINTS_SUBSET * NUM_SUBSETS;
+        
+        var NUM_LEVELS = 5;
+        var LEVEL_DEPTH = 400;
+
+        var DEF_BRIGHTNESS = 1;
+        var DEF_SATURATION = 0.8;
+        
+        var SPRITE_SIZE = Math.ceil(3 * window.innerWidth /1600);
+        
+        // Orbit parameters constraints
+        var A_MIN = -30;
+        var A_MAX = 30;
+        var B_MIN = .2;
+        var B_MAX = 1.8;
+        var C_MIN = 5;
+        var C_MAX = 17;
+        var D_MIN = 0;
+        var D_MAX = 10;
+        var E_MIN = 0;
+        var E_MAX = 12;
+
+        // Orbit parameters
+        var a, b, c, d, e;
+        
+        // Orbit data
+        var orbit = {
+            subsets: [],
+            xMin: 0,
+            xMax: 0,
+            yMin: 0,
+            yMax: 0,
+            scaleX: 0,
+            scaleY: 0
+        }
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(
+        new THREE.Vector3( -10,  10, 0 ),
+        new THREE.Vector3( -10, -10, 0 ),
+        new THREE.Vector3(  10, -10, 0 ));
+        var vertex = geometry.vertices.push(new THREE.Vector3(0,0,0));
+
+        
+
+
+        // Initialize data points
+        for (var i = 0; i < NUM_SUBSETS; i++){
+            var subsetPoints = [];
+            for (var j = 0; j < NUM_POINTS_SUBSET; j++){
+                subsetPoints[j] = {
+                    x: 0,
+                    y: 0, 
+                    vertex:  vertex
+                };
+            }
+            orbit.subsets.push(subsetPoints);
+        }           
+        
+        var container, stats;
+        var camera, scene, renderer, composer, hueValues = [];
+        
+        var mouseX = 0, mouseY = 0;
+
+        var windowHalfX = window.innerWidth / 2;
+        var windowHalfY = window.innerHeight / 2;
+
+        var speed = 6;
+        var rotationSpeed = 0.005;
+        
+        init();
+        animate();
+
+        function init() {
+
+            THREE.ImageUtils.crossOrigin = '';
+            var texture = THREE.ImageUtils.loadTexture("https://s3-us-west-1.amazonaws.com/danielfiles/THEREALGALAXY.png" );
+
+            container = document.createElement( 'div' );
+            document.body.appendChild( container );
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3 * SCALE_FACTOR );
+            camera.position.z = SCALE_FACTOR/2;
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2( 0x000000, 0.0012);
+
+            generateOrbit();
+            
+            for (var s = 0; s < NUM_SUBSETS; s++){hueValues[s] = Math.random();}
+            
+            // Create particle systems
+            for (var k = 0; k < NUM_LEVELS; k++){
+                for (var s = 0; s < NUM_SUBSETS; s++){
+                    var geometry = new THREE.Geometry();
+                    for (var i = 0; i < NUM_POINTS_SUBSET; i++){geometry.vertices.push( orbit.subsets[s][i].vertex);}
+                    var materials = new THREE.ParticleBasicMaterial( { size: (SPRITE_SIZE ), map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
+                    materials.color.setHSL(hueValues[s], DEF_SATURATION, DEF_BRIGHTNESS);
+                    var particles = new THREE.ParticleSystem( geometry, materials );
+                    particles.myMaterial = materials;
+                    particles.myLevel = k;
+                    particles.mySubset = s;
+                    particles.position.x = 0;
+                    particles.position.y = 0;
+                    particles.position.z = - LEVEL_DEPTH * k - (s  * LEVEL_DEPTH / NUM_SUBSETS) + SCALE_FACTOR/2;
+                    particles.needsUpdate = 0;
+                    scene.add( particles );
+                }
+            }
+
+            // Setup renderer and effects
+            renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+            container.appendChild( renderer.domElement );
+
+        
+            
+            // Setup listeners
+            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+            document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+            document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+            document.addEventListener( 'keydown', onKeyDown, false );
+            window.addEventListener( 'resize', onWindowResize, false );
+            
+            // Schedule orbit regeneration
+            setInterval(updateOrbit, 7000);
+        }
+
+        function animate() {
+            requestAnimationFrame( animate );
+            render();
+            //stats.update();
+        }
+
+        function render() {
+                        
+            if (camera.position.x >= - CAMERA_BOUND && camera.position.x <= CAMERA_BOUND){
+                camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+                if (camera.position.x < - CAMERA_BOUND) camera.position.x = -CAMERA_BOUND;
+                if (camera.position.x >  CAMERA_BOUND) camera.position.x = CAMERA_BOUND;
+            }
+            if (camera.position.y >= - CAMERA_BOUND && camera.position.y <= CAMERA_BOUND){
+                camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+                if (camera.position.y < - CAMERA_BOUND) camera.position.y = -CAMERA_BOUND;
+                if (camera.position.y >  CAMERA_BOUND) camera.position.y = CAMERA_BOUND;
+            }
+            
+            camera.lookAt( scene.position );
+            
+            
+            for( i = 0; i < scene.children.length; i++ ) {
+             var object = scene.children[i]
+             object.position.z +=  speed;
+             object.rotation.z += rotationSpeed;
+             if (object.position.z > camera.position.z){
+
+                 object.position.z = - (NUM_LEVELS -1) * LEVEL_DEPTH;
+                 if (object.needsUpdate == 1){ // 
+                     object.geometry.__dirtyVertices = true;    
+                     object.myMaterial.color.setHSL(hueValues[object.mySubset], DEF_SATURATION, DEF_BRIGHTNESS); //
+                     object.needsUpdate = 0;
+                 }
+             }
+            }
+            
+            renderer.render( scene, camera );
+        }
+
+        ///////////////////////////////////////////////
+        // Hopalong Orbit Generator
+        ///////////////////////////////////////////////         
+        function updateOrbit(){
+            generateOrbit();
+            for (var s = 0; s < NUM_SUBSETS; s++){
+                hueValues[s] = Math.random();
+            }
+            for( i = 0; i < scene.children.length; i++ ) {
+                var object = scene.children[i];
+                object.needsUpdate = 1;
+            }
+
+        }
+        
+        function generateOrbit(){
+            var x, y, z, x1;
+            var idx = 0;
+
+            prepareOrbit();
+            
+            // Using local vars should be faster
+            var al = a;
+            var bl = b;
+            var cl = c;
+            var dl = d;
+            var el = e;
+            var subsets = orbit.subsets;
+            var num_points_subset_l = NUM_POINTS_SUBSET;
+            var num_points_l = NUM_POINTS;
+            var scale_factor_l = SCALE_FACTOR;
+            
+            var xMin = 0, xMax = 0, yMin = 0, yMax = 0;
+
+            for (var s = 0; s < NUM_SUBSETS; s++){
+            
+                // Use a different starting point for each orbit subset
+                x = s * .005 * (0.5-Math.random());
+                y = s * .005 * (0.5-Math.random());
+                
+                var curSubset = subsets[s];
+                
+                for (var i = 0; i < num_points_subset_l; i++){
+                
+                    // Iteration formula (generalization of the Barry Martin's original one)
+                    z = (dl + Math.sqrt(Math.abs(bl * x - cl)));
+                    if (x > 0) {x1 = y - z;}
+                    else if (x == 0) {x1 = y;}
+                    else {x1 = y + z;}
+                    y = al - x;
+                    x = x1 + el;        
+
+                    curSubset[i].x = x;
+                    curSubset[i].y = y;
+                    
+                    if (x < xMin) {xMin = x;}
+                    else if (x > xMax) {xMax = x;}
+                    if (y < yMin) {yMin = y;}
+                    else if (y > yMax) {yMax = y;}
+                    
+                    idx++;
+                }
+            }
+                            
+            var scaleX = 2 * scale_factor_l / (xMax - xMin);
+            var scaleY = 2 * scale_factor_l / (yMax - yMin);
+            
+            orbit.xMin = xMin;
+            orbit.xMax = xMax;
+            orbit.yMin = yMin;
+            orbit.yMax = yMax;
+            orbit.scaleX = scaleX;
+            orbit.scaleY = scaleY;
+            
+            // Normalize and update vertex data             
+            for (var s = 0; s < NUM_SUBSETS; s++){
+                var curSubset = subsets[s];
+                for (var i = 0; i < num_points_subset_l; i++){
+                    curSubset[i].vertex.x = scaleX * (curSubset[i].x - xMin) - scale_factor_l;
+                    curSubset[i].vertex.y = scaleY * (curSubset[i].y - yMin) - scale_factor_l;                 
+                }
+            }
+        }
+        
+        function prepareOrbit(){
+            shuffleParams();
+            orbit.xMin = 0;
+            orbit.xMax = 0;
+            orbit.yMin = 0;
+            orbit.yMax = 0;
+        }
+        
+        function shuffleParams() {
+            a = A_MIN + Math.random() * (A_MAX - A_MIN);
+            b = B_MIN + Math.random() * (B_MAX - B_MIN);
+            c = C_MIN + Math.random() * (C_MAX - C_MIN);
+                        d = D_MIN + Math.random() * (D_MAX - D_MIN);
+            e = E_MIN + Math.random() * (E_MAX - E_MIN);
+        }
+
+        ///////////////////////////////////////////////
+        // Event listeners
+        ///////////////////////////////////////////////
+        function onDocumentMouseMove( event ) {
+            mouseX = event.clientX - windowHalfX;
+            mouseY = event.clientY - windowHalfY;
+        }
+
+        function onDocumentTouchStart( event ) {
+            if ( event.touches.length == 1 ) {
+                event.preventDefault();
+                mouseX = event.touches[ 0 ].pageX - windowHalfX;
+                mouseY = event.touches[ 0 ].pageY - windowHalfY;
+            }
+        }
+
+        function onDocumentTouchMove( event ) {
+            if ( event.touches.length == 1 ) {
+                event.preventDefault();
+                mouseX = event.touches[ 0 ].pageX - windowHalfX;
+                mouseY = event.touches[ 0 ].pageY - windowHalfY;
+            }
+        }
+
+        function onWindowResize( event ) {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+        }               
+        
+        function onKeyDown(event){
+            if(event.keyCode == 38 && speed < 20) speed += .5;
+            else if(event.keyCode == 40 && speed > 0) speed -= .5;
+            else if(event.keyCode == 37) rotationSpeed += .001;
+            else if(event.keyCode == 39) rotationSpeed -= .001;
+            else if(event.keyCode == 72 || event.keyCode == 104) toggleVisuals();
+        }
+    
+        function showHideAbout() {
+            if (document.getElementById('about').style.display == "block") {
+                document.getElementById('about').style.display = "none";
+            } else {
+                document.getElementById('about').style.display = "block";
+            }
+        }
+        
+        function toggleVisuals(){
+            if(VISUALS_VISIBLE){
+                document.getElementById('plusone').style.display = 'none';
+                document.getElementById('tweet').style.display = 'none';
+                document.getElementById('fb').style.display = 'none';
+                document.getElementById('aboutlink').style.display = 'none';
+                document.getElementById('about').style.display = 'none';
+                document.getElementById('info').style.display = 'none';
+                document.getElementById('chaosnebula').style.display = 'none';
+                stats.domElement.style.display = 'none';
+                renderer.domElement.style.cursor = "none";
+                VISUALS_VISIBLE = false;
+            }
+            else {
+                document.getElementById('plusone').style.display = 'block';
+                document.getElementById('tweet').style.display = 'block';
+                document.getElementById('fb').style.display = 'block';
+                document.getElementById('aboutlink').style.display = 'block';
+                document.getElementById('info').style.display = 'block';
+                document.getElementById('chaosnebula').style.display = 'block';
+                stats.domElement.style.display = 'block';
+                renderer.domElement.style.cursor = "";
+                VISUALS_VISIBLE = true;
+            }
+        }
+        </script>
+    
+
+
+
+
+
+            </script><div><canvas width="1600" height="744"></canvas><div style="cursor: pointer; width: 80px; opacity: 0.9; z-index: 10001; position: absolute; top: 5px; right: 5px;"><div style="padding: 2px 0px 3px; background-color: rgb(8, 8, 24);"><div style="font-family: Helvetica, Arial, sans-serif; text-align: left; font-size: 9px; color: rgb(0, 255, 255); margin: 0px 0px 1px 3px;"><span style="font-weight:bold">45 FPS</span> (1-60)</div><canvas width="74" height="30" style="display: block; margin-left: 3px;"></canvas></div><div style="padding: 2px 0px 3px; display: none; background-color: rgb(8, 24, 8);"><div style="font-family: Helvetica, Arial, sans-serif; text-align: left; font-size: 9px; color: rgb(0, 255, 0); margin: 0px 0px 1px 3px;"><span style="font-weight:bold">15 MS</span> (3-12851)</div><canvas width="74" height="30" style="display: block; margin-left: 3px;"></canvas></div><div style="padding: 2px 0px 3px; display: none; background-color: rgb(24, 8, 13);"><div style="font-family: Helvetica, Arial, sans-serif; text-align: left; font-size: 9px; color: rgb(255, 0, 128); margin: 0px 0px 1px 3px;"><span style="font-weight:bold">78 MB</span> (78-78)</div><canvas width="74" height="30" style="display: block; margin-left: 3px;"></canvas></div></div></div>
+    
+    <div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div><iframe name="fb_xdm_frame_http" frameborder="0" allowtransparency="true" scrolling="no" id="fb_xdm_frame_http" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/6Dg4oLkBbYq.html" style="border: none;"></iframe><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" scrolling="no" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/6Dg4oLkBbYq(1).html" style="border: none;"></iframe></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>  
+    
+        
+        
+        <div id="info">Barry Martin's Hopalong Orbits Visualizer - Created using <a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a>
+        <br> [Mouse Move] Camera position
+        <br> [Up-Down] Control speed - [Left-Right] Control rotation
+        <br> [H] Toggle info and cursor - [F11] Toggle fullscreen
+        </div>
+
+        <div id="aboutlink">
+        <a href="javascript:showHideAbout()">About</a>
+    </div>
+    <div id="about">
+            <b>Barry Martin's Hopalong Orbits Visualizer</b>
+            <p>These orbits are generated iterating this simple algorithm:</p>
+            
+            <p>(x, y) -&gt; (y - sign(x)*sqrt(abs(b*x - c)), a -x )</p>
+
+            <p>where a, b, c are random parameters. This is known as the 'Hopalong Attractor'.</p>
+            <p>3D rendering is done using WebGL and <a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a></p>
+            <hr>
+            <p><a href="https://plus.google.com/113975837825449148012?rel=author" onclick="recordOutboundLink(this, &#39;Outbound Links&#39;, &#39;plus.google.com&#39;);return false;">About me</a></p>
+            <a href="http://www.chromeexperiments.com/detail/webgl-attractors-trip/?f=" onclick="recordOutboundLink(this, &#39;Outbound Links&#39;, &#39;chromeexperiments.com&#39;);return false;"><img src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/badge-black_black.png" alt="See my Experiment on ChromeExperiments.com"></a>
+    </div>
+        
+    <div id="plusone">
+    <div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 106px; height: 24px; background: transparent;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" tabindex="0" vspace="0" width="100%" id="I0_1428217430697" name="I0_1428217430697" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/fastbutton.html" data-gapiattached="true" title="+1"></iframe></div>
+    </div>
+    <div id="tweet">
+    <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/tweet_button.23a4a4933995b86880bb787f8ff6a082.en.html" class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-horizontal" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 108px; height: 20px;"></iframe><script type="text/javascript" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/widgets.js"></script>
+    </div>
+    <div id="fb">
+        <div style="position:relative; top:0px;" class="fb-like fb_iframe_widget" data-href="http://iacopoapps.appspot.com/hopalongwebgl/" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true" data-colorscheme="dark" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=&amp;color_scheme=dark&amp;container_width=0&amp;href=http%3A%2F%2Fiacopoapps.appspot.com%2Fhopalongwebgl%2F&amp;layout=button_count&amp;locale=en_US&amp;sdk=joey&amp;send=false&amp;show_faces=true&amp;width=450"><span style="vertical-align: bottom; width: 80px; height: 20px;"><iframe name="f20f10a8d" width="450px" height="1000px" frameborder="0" allowtransparency="true" scrolling="no" title="fb:like Facebook Social Plugin" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/like.html" style="border: none; visibility: visible; width: 80px; height: 20px;" class=""></iframe></span></div>
+    </div>
+    <div id="chaosnebula">
+    See also <a target="cn" href="https://play.google.com/store/apps/details?id=com.pixmath.chaosnebulagl" onclick="recordOutboundLink(this, &#39;Outbound Links&#39;, &#39;play.google.com&#39;);return false;">ChaosNebulaGL</a> Android live wallpaper
+    </div>
+
+    <script type="text/javascript">
+      (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/plusone.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })();
+    </script>
+
+    
+
+<iframe name="oauth2relay335723297" id="oauth2relay335723297" src="./Barry Martin's Hopalong Orbits Visualizer - WebGL Experiment_files/postmessageRelay.html" tabindex="-1" style="width: 1px; height: 1px; position: absolute; top: -100px;"></iframe></body></html>
