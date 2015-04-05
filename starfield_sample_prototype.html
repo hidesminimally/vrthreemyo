@@ -1,0 +1,236 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js particle tutorial</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #FFF000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+		<script src="js/three.min.js"></script>
+		<script src="jaanga_StereoEffect.js"></script>
+		<script src="jaanga_DeviceOrientationControls.js"></script>
+		<script src="jaanga_DetectScreenSize.js"></script>
+	</head>
+	<body>
+		<script>
+
+			var SPRITE_SIZE = Math.ceil(3 * window.innerWidth /1600);
+			var sprite1 = THREE.ImageUtils.loadTexture( "https://s-media-cache-ak0.pinimg.com/30x30/9c/8d/57/9c8d573e6477b03d8e51d7453d47cd5f.jpg" ); // fix!!!!!!
+			var info, stats, renderer, scene, camera, controls;
+			var effect;
+			// the main three.js components
+			var camera, scene, renderer,hueValues = [];
+
+			var DEF_BRIGHTNESS = 1;
+			var DEF_SATURATION = 0.7;
+
+			// to keep track of the mouse position
+//				mouseX = 0, mouseY = 99,
+
+			//////////////////UNCOMMENT THIS OUT var controls = undefined;
+			// an array to store our particles in
+				particles = [];
+
+			var hasOrientation = function(evt) {
+				if (!evt.alpha) {
+					return;
+				}
+				window.removeEventListener('deviceorientation', hasOrientation, false); // ?
+				controls = new THREE.DeviceOrientationControls( camera ); //for the phone 
+				controls.connect(); // connect to camera 
+			};	
+
+			// let's get going! 
+			init();
+			animate(); // important - for the axis 
+
+			function init() {
+				var geometry, material, mesh; // don'tneed 
+				document.body.style.cssText = 'font: 600 12pt monospace; margin: 0; overflow: hidden' ; // what don't need 
+
+
+				var container = document.body.appendChild( document.createElement( 'div' ) ); // nope 
+
+				// Camera params : 
+				// field of view, aspect ratio for render output, near and far clipping plane. 
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 5000 ); // keep this
+	
+				// move the camera backwards so we can see stuff! 
+				// default position is 0,0,0. 
+				camera.position.z = 0;
+
+				// the scene contains all the 3D object data
+				scene = new THREE.Scene();
+				
+				// camera needs to go in the scene 
+				scene.add(camera);
+	
+				// and the CanvasRenderer figures out what the 
+				// stuff in the scene looks like and draws it!
+	 
+			    renderer = new THREE.WebGLRenderer( { clearColor: 0x0F0000, clearAlpha: 1 } );
+                            renderer.setSize( window.innerWidth, window.innerHeight );
+                            container.appendChild( renderer.domElement );
+
+//shit gets FUCKED here
+				effect = new THREE.StereoEffect( renderer );
+				effect.separation = 0.2;
+				effect.targetDistance = 50;
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+	
+				// the renderer's canvas domElement is added to the body
+
+
+				makeParticles(); 
+			
+				// add the mouse move listener
+				//document.addEventListener( 'mousemove', onMouseMove, false );
+				
+				// render 30 times a second (should also look 
+				// at requestAnimationFrame) 
+				setInterval(update,1000/300); 
+			
+			}
+
+			// the main update function, called 30 times a second
+
+			function update() {
+
+				updateParticles();
+
+				// and render the scene from the perspective of the camera
+				renderer.render( scene, camera );
+
+			}
+
+			// creates a random field of Particle objects
+			
+			function makeParticles() { 
+				
+				var particle, material; 
+
+				// we're gonna move from z position -1000 (far away) 
+				// to 1000 (where the camera is) and add a random particle at every pos. 
+				for ( var zpos= -1000; zpos < 1000; zpos+=20 ) {
+		
+					// we make a particle material and pass through the 
+					// colour and custom particle render function we defined. 
+					var materials = new THREE.PointCloudMaterial( { size: (SPRITE_SIZE ), map: sprite1, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
+					// materials.color.setHSV(hueValues[s], DEF_SATURATION, DEF_BRIGHTNESS);
+					// THE FIX!!!! PARTCILE BASIC MATERIAL!!!!!
+
+					// make the particle
+					particle = new THREE.Particle(material);
+		
+					// give it a random x and y position between -500 and 500
+					particle.position.x = Math.random() * 1000 - 500;
+					particle.position.y = Math.random() * 1000 - 500;
+		
+					// set its z position
+					particle.position.z = zpos;
+		
+					// scale it up a bit
+					particle.scale.x = particle.scale.y = 10; // THIS CONTROLS THE SIZE OF THE PARTICLES 
+		
+					// add it to the scene
+					scene.add( particle );
+		
+					// and to the array of particles. 
+					particles.push(particle); 
+				}
+				
+			}
+			
+			// there isn't a built in circle particle renderer 
+			// so we have to define our own. 
+
+			function particleRender( context ) {
+				
+				// we get passed a reference to the canvas context
+				context.beginPath();
+				// and we just have to draw our shape at 0,0 - in this
+				// case an arc from 0 to 2Pi radians or 360º - a full circle!
+				context.arc( 0, 0, 1, 0,  Math.PI * 2, true );
+				context.fill();
+			};
+
+			
+			// moves all the particles dependent on mouse position
+			
+			function updateParticles() { 
+				
+				// iterate through every particle
+				for(var i=0; i<particles.length; i++) {
+		
+					particle = particles[i]; 
+		
+					// and move it forward dependent on the mouseY position. 
+					particle.position.z +=  99 * 0.1;
+					//
+					//
+					// CHANGE THIS!!!! CONTROLS.BETA
+		
+					// if the particle is too close move it to the back
+					if(particle.position.z > 1000) particle.position.z -= 2000; 
+		
+				}
+	
+			}
+
+
+			window.addEventListener('deviceorientation', hasOrientation, false);
+
+
+			window.addEventListener( 'touchend', function () {
+			if ( isFullscreen === false ) {
+				document.body.webkitRequestFullscreen();
+				isFullscreen = true;
+			} else {
+				document.webkitExitFullscreen();
+				isFullscreen = false;
+			}
+		} );
+
+
+			window.addEventListener( 'resize', function () {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				effect.setSize( window.innerWidth, window.innerHeight );
+			}, false );
+
+			
+			function animate() {// need this 
+				requestAnimationFrame( animate );
+				if ( controls !== undefined ) {
+					controls.update();
+					msg.innerHTML =
+						'<table><tr><td>' +
+						'oQ.w ' + controls.orientationQuaternion.w.toFixed(3) + '<br>' +
+						'oQ.x ' + controls.orientationQuaternion.x.toFixed(3) + '<br>' +
+						'oQ.y ' + controls.orientationQuaternion.y.toFixed(3) + '<br>' +
+						'oQ.z ' + controls.orientationQuaternion.z.toFixed(3) + '<br>' +
+						'aQ.w ' + controls.alignQuaternion.w.toFixed(3) + '<br>' +
+						'aQ.x ' + controls.alignQuaternion.x.toFixed(3) + '<br>' +
+						'aQ.y ' + controls.alignQuaternion.y.toFixed(3) + '<br>' +
+						'aQ.z ' + controls.alignQuaternion.z.toFixed(3) + '<br>' +
+						'</td>' +
+						'<td>' +
+						'alpha ' + controls.alpha.toFixed(3) + '<br>' +
+						'beta ' + controls.beta.toFixed(3) + '<br>' +
+						'gamma ' + controls.gamma.toFixed(3) + '<br>' +
+						'movSpd ' + controls.movementSpeed + '<br>' +
+						'rllSpd ' + controls.rollSpeed + '<br>' +
+						'</td></tr></table>' +
+					'';
+				}
+				effect.render( scene, camera );
+			};
+		</script>
+	</body>
+</html>
